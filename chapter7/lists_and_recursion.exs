@@ -23,4 +23,14 @@ defmodule ListsAndRecursion do
       _max(tail, head)
     end
   end
+
+  def caesar(list, n), do: _caesar(list, n, [])
+
+  defp _caesar([], _, result), do: Enum.reverse(result) 
+  defp _caesar([head | tail], n, result) when head + n <= ?z do
+    _caesar(tail, n, [head + n | result])
+  end
+  defp _caesar([head | tail], n, result) do
+    _caesar(tail, n, [head + n - 26 | result])
+  end
 end
