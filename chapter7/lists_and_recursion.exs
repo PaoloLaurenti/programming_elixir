@@ -12,4 +12,15 @@ defmodule ListsAndRecursion do
 
   defp _mapsum([], _, total), do: total
   defp _mapsum([head | tail], function, total), do: _mapsum(tail, function, total + function.(head))
+
+  def max([head | tail] = list), do: _max(list, head)
+
+  defp _max([], max_result), do: max_result
+  defp _max([head | tail], current_max) do
+    if current_max >= head do
+      _max(tail, current_max)
+    else
+      _max(tail, head)
+    end
+  end
 end
