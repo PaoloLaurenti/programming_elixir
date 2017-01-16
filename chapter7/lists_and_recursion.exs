@@ -25,7 +25,7 @@ defmodule ListsAndRecursion do
   #############################################################################
   # Exercise: ListsAndRecursion-2
   # Write a max(list) that returns the element with the maximum value in the list
-  def max([head | tail] = list), do: _max(list, head)
+  def max([head | _tail] = list), do: _max(list, head)
 
   defp _max([], max_result), do: max_result
   defp _max([head | tail], current_max) do
@@ -60,6 +60,20 @@ defmodule ListsAndRecursion do
 
   defp _span(to, to, result), do: [to | result] |> Enum.reverse
   defp _span(from, to, partial_result), do: _span(from + 1, to, [from | partial_result])
+  #############################################################################
+
+  #############################################################################
+  # Exercise: ListsAndRecursion-5
+  # Implement the following Enum functions using no library functions or list comprehensions
+
+  #all?
+  def all?(enumerable, fun \\ fn x -> x end), do: _all?(enumerable, fun, true)
+
+  defp _all?(_enumerable, _fun, false), do: false
+  defp _all?([], _fun, result), do: result
+  defp _all?([head | tail], fun, partial_result), do: _all?(tail, fun, partial_result && to_bool(fun.(head)))
+
+  defp to_bool(value), do: !!value
   #############################################################################
 
 end
