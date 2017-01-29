@@ -82,7 +82,17 @@ defmodule ListsAndRecursion do
 
   defp _each([], _fun, result), do: Enum.reverse(result)
   defp _each([head | tail], fun, partial_result), do: _each(tail, fun, [fun.(head) | partial_result]) 
-  
+
+  #----------------------------------------------------------------------------
+ 
+  #filter
+  def filter(enumerable, fun), do: _filter(enumerable, fun, [])
+
+  defp _filter([], _fun, result), do: Enum.reverse(result)
+  defp _filter([head | tail], fun, partial_result), do: _filter(tail, fun, [fun.(head) | partial_result]) 
+
+  #----------------------------------------------------------------------------
+
   #############################################################################
 
 end
