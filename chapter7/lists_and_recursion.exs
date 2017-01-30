@@ -104,11 +104,11 @@ defmodule ListsAndRecursion do
   def split(enumerable, count), do: _split(Enum.reverse(enumerable), count, [], :backward)
 
   defp _split(remaining_part, 0, splitted_part), do: { Enum.reverse(splitted_part), remaining_part }
-  defp _split([], _count, splitted_part), do: { Enum.reverse(splitted_part), [] }
+  defp _split([], _count, splitted_part), do: _split([], 0, splitted_part)
   defp _split([head | tail], count, partial_splitted_part) when count > 0, do: _split(tail, count - 1, [head | partial_splitted_part])
 
   defp _split(remaining_part, 0, splitted_part, :backward), do: { Enum.reverse(remaining_part), splitted_part }
-  defp _split([], _count, splitted_part, :backward), do: { [], splitted_part }
+  defp _split([], _count, splitted_part, :backward), do: _split([], 0, splitted_part, :backward)
   defp _split([head | tail], count, partial_splitted_part, :backward), do: _split(tail, count + 1, [head | partial_splitted_part], :backward)
 
   #----------------------------------------------------------------------------
