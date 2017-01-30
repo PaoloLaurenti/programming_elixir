@@ -74,22 +74,28 @@ defmodule ListsAndRecursion do
   defp _all?([head | tail], fun, partial_result), do: _all?(tail, fun, partial_result && to_bool(fun.(head)))
 
   defp to_bool(value), do: !!value
-  
+
   #----------------------------------------------------------------------------
 
   #each
   def each(enumerable, fun), do: _each(enumerable, fun, [])
 
   defp _each([], _fun, result), do: Enum.reverse(result)
-  defp _each([head | tail], fun, partial_result), do: _each(tail, fun, [fun.(head) | partial_result]) 
+  defp _each([head | tail], fun, partial_result), do: _each(tail, fun, [fun.(head) | partial_result])
 
   #----------------------------------------------------------------------------
- 
+
   #filter
   def filter(enumerable, fun), do: _filter(enumerable, fun, [])
 
   defp _filter([], _fun, result), do: Enum.reverse(result)
-  defp _filter([head | tail], fun, partial_result), do: _filter(tail, fun, [fun.(head) | partial_result]) 
+  defp _filter([head | tail], fun, partial_result) do
+    if fun.(head) do
+      _filter(tail, fun, [head | partial_result])
+    else
+      _filter(tail, fun, partial_result)
+    end
+  end
 
   #----------------------------------------------------------------------------
 
