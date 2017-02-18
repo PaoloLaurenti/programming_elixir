@@ -123,4 +123,20 @@ defmodule ListsAndRecursion do
 
   #############################################################################
 
+  #############################################################################
+  # Exercise: ListsAndRecursion-6
+  # Write a flatten(list) function that takes a list that may contain any number of sublists, which themselves may contain sublists, to any depth. It returns the elements of these lists as a flat list.
+  def flatten(array) when is_list(array) do
+    flatten(array, [])
+      |> Enum.reverse
+  end
+
+  defp flatten(array, result) when is_list(array) do
+    Enum.reduce(array, result, &flatten/2)
+  end
+
+  defp flatten(value, result) when is_integer(value) do
+    [value | result]
+  end
+  #############################################################################
 end
