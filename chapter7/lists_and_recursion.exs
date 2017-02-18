@@ -113,6 +113,14 @@ defmodule ListsAndRecursion do
 
   #----------------------------------------------------------------------------
 
+  #take
+  def take(enumerable, count) when count < 0, do: Enum.reverse(_take(Enum.reverse(enumerable), count * -1, []))
+  def take(enumerable, count), do: _take(enumerable, count, [])
+
+  defp _take([], _count, result), do: Enum.reverse(result)
+  defp _take(_enumerable, 0, result), do: _take([], 0, result)
+  defp _take([head | tail], count, partial_result), do: _take(tail, count - 1, [head | partial_result])
+
   #############################################################################
 
 end
