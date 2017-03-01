@@ -87,4 +87,31 @@ defmodule ListsAndRecursion do
     [value | result]
   end
   #############################################################################
+
+  #############################################################################
+  # Exercise: ListsAndRecursion-7
+  # In the last exercise of Chapter 7, Lists and Recursion , you
+  # wrote a span function. Use it and list comprehensions to return a list of
+  # the prime numbers from 2 to n.
+
+  #defp is_prime(number), do: is_prime(number, 2)
+  #defp is_prime(number, number), do: true
+  #defp is_prime(number, divisor) when rem(number, divisor) == 0, do: is_prime(number, divisor + 1)
+
+  def span2(from, to) do
+    for n <- from..to, is_prime(n), do: n
+  end
+
+  def is_prime(2), do: true
+  def is_prime(number) when number > 2 do
+    2..number-1
+    |> Enum.reduce_while(true, fn(n, acc) ->
+      if (rem(number, n)) == 0 do
+        {:halt, false}
+      else
+        {:cont, acc}
+      end
+    end)
+  end
+
 end
