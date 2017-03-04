@@ -3,16 +3,20 @@ defmodule ListsAndRecursion do
   #############################################################################
   # Exercise: ListsAndRecursion-4
   # Write a function MyList.span(from, to) that returns a list of the numbers from from up to to
+  #############################################################################
+
   def span(from, to) when from > to, do: raise "From parameter must be smaller than to parameter"
   def span(from, to), do: _span(from, to, [])
 
   defp _span(to, to, result), do: [to | result] |> Enum.reverse
   defp _span(from, to, partial_result), do: _span(from + 1, to, [from | partial_result])
+
   #############################################################################
 
   #############################################################################
   # Exercise: ListsAndRecursion-5
   # Implement the following Enum functions using no library functions or list comprehensions
+  #############################################################################
 
   #all?
   def all?(enumerable, fun \\ fn x -> x end), do: _all?(enumerable, fun, true)
@@ -74,6 +78,8 @@ defmodule ListsAndRecursion do
   #############################################################################
   # Exercise: ListsAndRecursion-6
   # Write a flatten(list) function that takes a list that may contain any number of sublists, which themselves may contain sublists, to any depth. It returns the elements of these lists as a flat list.
+  #############################################################################
+
   def flatten(array) when is_list(array) do
     flatten(array, [])
       |> Enum.reverse
@@ -86,6 +92,7 @@ defmodule ListsAndRecursion do
   defp flatten(value, result) when is_integer(value) do
     [value | result]
   end
+
   #############################################################################
 
   #############################################################################
@@ -93,6 +100,7 @@ defmodule ListsAndRecursion do
   # In the last exercise of Chapter 7, Lists and Recursion , you
   # wrote a span function. Use it and list comprehensions to return a list of
   # the prime numbers from 2 to n.
+  #############################################################################
 
   def span2(from, to) do
     for n <- from..to, is_prime(n), do: n
@@ -109,6 +117,33 @@ defmodule ListsAndRecursion do
       end
     end)
   end
+
+  #############################################################################
+
+  #############################################################################
+  # Exercise: ListsAndRecursion-8
+  # The Pragmatic Bookshelf has offices in Texas (TX) and North Carolina (NC), so we have to charge sales tax on orders shipped to these states.
+  #############################################################################
+
+  def insert_total_amount() do
+    tax_rates = [ NC: 0.075, TX: 0.08 ]
+    orders = [ [ id: 123, ship_to: :NC, net_amount: 100.00 ],
+               [ id: 124, ship_to: :OK, net_amount: 35.50 ],
+               [ id: 125, ship_to: :TX, net_amount: 24.00 ],
+               [ id: 126, ship_to: :TX, net_amount: 44.80 ],
+               [ id: 127, ship_to: :NC, net_amount: 25.00 ],
+               [ id: 128, ship_to: :MA, net_amount: 10.00 ],
+               [ id: 129, ship_to: :CA, net_amount: 102.00 ],
+               [ id: 130, ship_to: :NC, net_amount: 50.00 ] ]
+
+    for o <- orders do
+      tax = tax_rates[o[:ship_to]] || 0
+      total_amount = Float.round(o[:net_amount] + tax, 3)
+      Keyword.put(o, :total_amount, total_amount)
+    end
+
+  end
+
   #############################################################################
 
 end
