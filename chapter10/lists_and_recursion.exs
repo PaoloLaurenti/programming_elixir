@@ -94,10 +94,6 @@ defmodule ListsAndRecursion do
   # wrote a span function. Use it and list comprehensions to return a list of
   # the prime numbers from 2 to n.
 
-  #defp is_prime(number), do: is_prime(number, 2)
-  #defp is_prime(number, number), do: true
-  #defp is_prime(number, divisor) when rem(number, divisor) == 0, do: is_prime(number, divisor + 1)
-
   def span2(from, to) do
     for n <- from..to, is_prime(n), do: n
   end
@@ -113,5 +109,6 @@ defmodule ListsAndRecursion do
       end
     end)
   end
+  #############################################################################
 
 end
