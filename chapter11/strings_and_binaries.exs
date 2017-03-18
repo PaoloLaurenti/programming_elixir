@@ -98,4 +98,41 @@ defmodule StringsAndBinaries do
 
   ############################################################################
 
+
+  ############################################################################
+  # Exercise: StringsAndBinaries-7
+  # Write a function that reads and parses this file and then passes the result to the sales_tax function.
+  # Remember that the data should be formatted into a keyword list, and that the fields need to be the correct types
+  # (so the id field is an integer, and so on).
+  ############################################################################
+
+  def get_total_amount(sale_information_file_path) do
+    {:ok, file} = File.open(sale_information_file_path, [:read, :binary, :utf8])
+    orders =
+      IO.stream(file, :line)
+      |> Stream.drop(1)
+      |> Stream.map(&entry_to_keyword_list/1)
+      |> Enum.to_list
+    File.close(file)
+    #IO.inspect orders
+    sales_tax(orders)
+  end
+
+  defp entry_to_keyword_list(entry) do
+    entry = String.trim_trailing(entry, "\n")
+    [id, ship_to, net_amount] = String.split(entry, ",")
+    [id: String.to_integer(id), ship_to: String.to_atom(String.trim_leading(ship_to, ":")), net_amount: String.to_float(net_amount)]
+  end
+
+  defp sales_tax(orders) do
+    tax_rates = [ NC: 0.075, TX: 0.08 ]
+    for o <- orders do
+      tax = tax_rates[o[:ship_to]] || 0
+      total_amount = Float.round(o[:net_amount] + tax, 3)
+      Keyword.put(o, :total_amount, total_amount)
+    end
+  end
+
+  ############################################################################
+
 end
