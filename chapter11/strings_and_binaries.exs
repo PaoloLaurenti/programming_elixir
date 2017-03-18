@@ -53,4 +53,34 @@ defmodule StringsAndBinaries do
   defp calculate(number1, ?/, number2), do: number1 / number2
 
   ############################################################################
+
+  ############################################################################
+  # Exercise: StringsAndBinaries-5
+  # Write a function that takes a list of dqs and prints each on a separate line,
+  # centered in a column that has the width of the longest string.
+  # Make sure it works with UTF characters.
+  ############################################################################
+
+  def print_centered(strings) do
+    max_length =
+      Enum.map(strings, &(String.length(&1)))
+      |> Enum.max()
+    print_centered(strings, max_length)
+  end
+
+  defp print_centered([], _) do
+  end
+
+  defp print_centered([string | other_strings], max_length) do
+    string_length = String.length string
+    spaces_count = max_length - string_length
+    leading_spaces_count = div spaces_count, 2
+    trailing_spaces_count = round(spaces_count/2)
+    output = String.pad_leading(string, leading_spaces_count + string_length, " ") |> String.pad_trailing(trailing_spaces_count + string_length, " ")
+    IO.puts output
+    print_centered(other_strings, max_length)
+  end
+
+  ############################################################################
+
 end
