@@ -83,4 +83,19 @@ defmodule StringsAndBinaries do
 
   ############################################################################
 
+  ############################################################################
+  # Exercise: StringsAndBinaries-6
+  # Write a function to capitalize the sentences in a string.
+  # Each sentence is terminated by a period and a space.
+  # Right now, the case of the characters in the string is random
+  ############################################################################
+
+  def capitalize_senteces(string) do
+    senteces = String.split(string, ". ", trim: true)
+    result = Enum.map(senteces, &(String.capitalize(&1) <> ". ")) |> List.to_string
+    IO.puts result
+  end
+
+  ############################################################################
+
 end
