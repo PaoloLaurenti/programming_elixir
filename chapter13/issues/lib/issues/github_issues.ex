@@ -11,15 +11,19 @@ defmodule Issues.GithubIssues do
 
   # use a module attribute to fetch the value at compile time
   @github_url Application.get_env(:issues, :github_url)
+  @http_proxy System.get_env("HTTP_PROXY")
 
   def fetch(user, project) do
     issues_url(user, project)
-    |> HTTPoison.get(@user_agent)
+    |> http_get(@http_proxy)
     |> handle_response
   end
 
+  def http_get(url, nil), do: HTTPoison.get(url, @user_agent)
+  def http_get(url, proxy), do: HTTPoison.get(url, @user_agent, [{ :proxy, proxy }])
+
   def issues_url(user, project) do
-    "#{@github_url}/repo/#{user}/#{project}/issues"
+    "#{@github_url}/repos/#{user}/#{project}/issues"
   end
 
   def handle_response({ :ok, %{status_code: 200, body: body}}) do
