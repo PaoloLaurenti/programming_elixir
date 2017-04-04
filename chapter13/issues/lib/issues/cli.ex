@@ -50,10 +50,12 @@ defmodule Issues.CLI do
   end
 
   def process({user, project, count}) do
-    Issues.GithubIssues.fetch(user, project)
+    issues = Issues.GithubIssues.fetch(user, project)
     |> decode_response
     |> sort_into_ascending_order
     |> Enum.take(count)
+
+    IO.puts build_report_for(issues)
   end
 
   def decode_response({:ok, body}), do: body
@@ -67,6 +69,20 @@ defmodule Issues.CLI do
     Enum.sort list_of_issues, fn(i1, i2) ->
       Map.get(i1, "created_at") <= Map.get(i2, "created_at")
     end
+  end
+
+  def build_report_for(issues) do
+    report_body = Enum.map(issues, &to_report_row/1)
+    header =    " #        | created_at         |  title                 "
+    separator = "----------+--------------------+------------------------"
+    Enum.join([header | [separator | report_body]], "\n")
+  end
+
+  def to_report_row(issue) do
+    id = Map.get(issue, "id") |> Integer.to_string |>String.pad_leading(10)
+    created_at = Map.get(issue, "created_at")
+    title = Map.get(issue, "title")
+    "#{id}|#{created_at}|#{title}"
   end
 
 end
