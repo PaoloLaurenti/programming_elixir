@@ -18,8 +18,10 @@ defmodule Issues.CLI do
   table of the last _n_ issues in a github project
   """
 
-  def run(argv) do
-    parse_args(argv)
+  def main(argv) do
+    argv
+    |> parse_args
+    |> process
   end
 
   @doc """
@@ -32,22 +34,22 @@ defmodule Issues.CLI do
   """
   def parse_args(argv) do
     parse = OptionParser.parse(argv, switches: [ help: :boolean],
-                               aliases:  [ h:    :help   ])
+                                     aliases:  [ h:    :help   ])
     case  parse  do
 
-      { [ help: true ], _, _ }
-      -> :help
-
-      { _, [ user, project, count ], _ }
-      -> { user, project, String.to_integer(count) }
-
-      { _, [ user, project ], _ }
-      -> { user, project, @default_count }
-
-      _ -> :help
-
+    { [ help: true ], _,           _ } -> :help
+    { _, [ user, project, count ], _ } -> { user, project, String.to_integer(count) }
+    { _, [ user, project ],        _ } -> { user, project, @default_count }
+    _                                  -> :help
     end
   end
+
+  def process(:help) do
+    IO.puts """
+    usage:  issues <user> <project> [ count | #{@default_count} ]
+    """
+    System.halt(0)
+  end 
 
   def process({user, project, count}) do
     issues = Issues.GithubIssues.fetch(user, project)
