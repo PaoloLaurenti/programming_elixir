@@ -7,6 +7,9 @@
 # Visit http://www.pragmaticprogrammer.com/titles/elixir13 for more book information.
 #---
 defmodule Issues.GithubIssues do
+
+  require Logger
+
   @user_agent  [ {"User-agent", "Elixir dave@pragprog.com"} ]
 
   # use a module attribute to fetch the value at compile time
@@ -14,6 +17,7 @@ defmodule Issues.GithubIssues do
   @http_proxy System.get_env("HTTP_PROXY")
 
   def fetch(user, project) do
+    Logger.info "Fetching user #{user}'s project #{project}"
     issues_url(user, project)
     |> http_get(@http_proxy)
     |> handle_response
@@ -27,10 +31,13 @@ defmodule Issues.GithubIssues do
   end
 
   def handle_response({ :ok, %{status_code: 200, body: body}}) do
+    Logger.info "Successful response"
+    Logger.debug fn -> inspect(body) end
     { :ok, Poison.Parser.parse!(body) }
   end
 
-  def handle_response({ _,   %{status_code: _,   body: body}}) do
+  def handle_response({ _, %{status_code: status, body: body}}) do
+    Logger.error "Error #{status} returned"
     { :error,  Poison.Parser.parse!(body) }
   end
 end
