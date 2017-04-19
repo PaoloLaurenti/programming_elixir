@@ -10,10 +10,12 @@
 defmodule DiamondClientTicker do
 
   @master_name :diamond_master
+  @timeout 3000
 
   def start do
     pid = spawn(__MODULE__, :generator, [])
     register_diamond_master(pid)
+    send pid, {:start}
     send :global.whereis_name(@master_name), {:register, pid}
   end
 
@@ -21,11 +23,38 @@ defmodule DiamondClientTicker do
     :global.register_name(@master_name, pid)
   end
 
-  def generator do
-    master_pid = :global.whereis_name(@master_name)
+  def generator(next_pid \\ self(), master_pid \\ self()) do
     receive do
-      {:register, pid} when pid === master_pid === self() ->
+      {:start} ->
+        master_pid = :global.whereis_name(@master_name)
+        generator(next_pid, master_pid)
+      {:register, pid} when pid === master_pid ->
+        IO.puts "Still all alone..."
         generator()
+      {:register, pid} when next_pid === master_pid ->
+        IO.puts "I am the last one, sending :set_next request to #{pid}"
+        send pid, {:set_next, master_pid}
+        generator(next_pid)
+      {:register, pid} ->
+        IO.puts "Pass through, I am not the last one..."
+        send next_pid, {:register, pid, next_pid}
+        generator(next_pid)
+      {:set_next, pid} ->
+        IO.puts ":set_next request received for pid #{pid}"
+        send pid, {:set_next_completed, self()}
+        generator(pid)
+      {:set_next_completed, pid} ->
+        IO.puts ":set_next_completed response received from pid #{pid}"
+        generator(pid)
+      {:tick} ->
+        IO.puts "tock in client"
+        generator(next_pid)
+    after @timeout ->
+        if (next_pid !== self()) do
+          IO.puts "tick"
+          send next_pid, {:tick}
+        end
+      generator(next_pid)
     end
   end
 end
