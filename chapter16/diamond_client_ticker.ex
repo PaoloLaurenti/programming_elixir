@@ -32,29 +32,29 @@ defmodule DiamondClientTicker do
         IO.puts "Still all alone..."
         generator()
       {:register, pid} when next_pid === master_pid ->
-        IO.puts "I am the last one, sending :set_next request to #{pid}"
-        send pid, {:set_next, master_pid}
-        generator(next_pid)
+        IO.puts "I am the last one, sending :set_next request to #{inspect pid}"
+        send pid, {:set_next, self(), master_pid}
+        generator(next_pid, master_pid)
       {:register, pid} ->
         IO.puts "Pass through, I am not the last one..."
-        send next_pid, {:register, pid, next_pid}
-        generator(next_pid)
-      {:set_next, pid} ->
-        IO.puts ":set_next request received for pid #{pid}"
-        send pid, {:set_next_completed, self()}
-        generator(pid)
+        send next_pid, {:register, pid}
+        generator(next_pid, master_pid)
+      {:set_next, source_pid, pid_to_set} ->
+        IO.puts ":set_next request received from #{inspect source_pid} for pid #{inspect pid_to_set}"
+        send source_pid, {:set_next_completed, self()}
+        generator(pid_to_set, master_pid)
       {:set_next_completed, pid} ->
-        IO.puts ":set_next_completed response received from pid #{pid}"
-        generator(pid)
-      {:tick} ->
-        IO.puts "tock in client"
-        generator(next_pid)
+        IO.puts ":set_next_completed response received from pid #{inspect pid}"
+        generator(pid, master_pid)
+      {:tick, source_pid} ->
+        IO.puts "tock in client, tick sent from #{inspect source_pid}"
+        generator(next_pid, master_pid)
     after @timeout ->
         if (next_pid !== self()) do
-          IO.puts "tick"
-          send next_pid, {:tick}
+          IO.puts "tick to #{inspect next_pid}"
+          send next_pid, {:tick, self()}
         end
-      generator(next_pid)
+      generator(next_pid, master_pid)
     end
   end
 end
