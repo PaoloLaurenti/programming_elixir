@@ -45,16 +45,24 @@ defmodule DiamondClientTicker do
         generator(pid_to_set, master_pid)
       {:set_next_completed, pid} ->
         IO.puts ":set_next_completed response received from pid #{inspect pid}"
+        if (master_pid === self()) do
+          myself = self()
+          spawn(__MODULE__, :send_tick, [myself, next_pid])
+        end
         generator(pid, master_pid)
       {:tick, source_pid} ->
         IO.puts "tock in client, tick sent from #{inspect source_pid}"
+        myself = self()
+        spawn(__MODULE__, :send_tick, [myself, next_pid])
         generator(next_pid, master_pid)
+    end
+  end
+
+  def send_tick(source_pid, next_pid) do
+    receive do
+      _ -> IO.puts "Impossible to reach..."
     after @timeout ->
-        if (next_pid !== self()) do
-          IO.puts "tick to #{inspect next_pid}"
-          send next_pid, {:tick, self()}
-        end
-      generator(next_pid, master_pid)
+        send next_pid, {:tick, source_pid}
     end
   end
 end
