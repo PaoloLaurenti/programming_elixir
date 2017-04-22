@@ -29,32 +29,32 @@ defmodule DiamondClientTicker do
         master_pid = :global.whereis_name(@master_name)
         generator(next_pid, master_pid)
       {:register, pid} when pid === master_pid ->
-        IO.puts "Still all alone..."
+        IO.puts "[#{inspect self()}] ==> Still all alone..."
         generator()
       {:register, pid} when next_pid === master_pid ->
-        IO.puts "I am the last one, sending :set_next request to #{inspect pid}"
+        IO.puts "[#{inspect self()}] ==> I am the last one, sending :set_next request to #{inspect pid}"
         send pid, {:set_next, self(), master_pid}
         generator(next_pid, master_pid)
       {:register, pid} ->
-        IO.puts "Pass through, I am not the last one..."
+        IO.puts "[#{inspect self()}] ==> Pass through, I am not the last one..."
         send next_pid, {:register, pid}
         generator(next_pid, master_pid)
       {:set_next, source_pid, pid_to_set} ->
-        IO.puts ":set_next request received from #{inspect source_pid} for pid #{inspect pid_to_set}"
+        IO.puts "[#{inspect self()}] ==> :set_next request received from #{inspect source_pid} for pid #{inspect pid_to_set}"
         send source_pid, {:set_next_completed, self()}
         generator(pid_to_set, master_pid)
       {:set_next_completed, pid} ->
-        IO.puts ":set_next_completed response received from pid #{inspect pid}"
+        IO.puts "[#{inspect self()}] ==> :set_next_completed response received from pid #{inspect pid}"
         if (master_pid === self()) do
           myself = self()
           spawn(__MODULE__, :send_tick, [myself, next_pid])
         end
-        generator(pid, master_pid)
+      generator(pid, master_pid)
       {:tick, source_pid} ->
-        IO.puts "tock in client, tick sent from #{inspect source_pid}"
-        myself = self()
-        spawn(__MODULE__, :send_tick, [myself, next_pid])
-        generator(next_pid, master_pid)
+      IO.puts "[#{inspect self()}] ==> tock in client, tick has been sent from #{inspect source_pid}"
+      myself = self()
+      spawn(__MODULE__, :send_tick, [myself, next_pid])
+      generator(next_pid, master_pid)
     end
   end
 
@@ -62,7 +62,8 @@ defmodule DiamondClientTicker do
     receive do
       _ -> IO.puts "Impossible to reach..."
     after @timeout ->
-        send next_pid, {:tick, source_pid}
+      send next_pid, {:tick, source_pid}
+      IO.puts "[#{inspect source_pid}] ==> New tick sent to #{inspect next_pid}"
     end
   end
 end
