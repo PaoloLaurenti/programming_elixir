@@ -21,4 +21,8 @@ defmodule Stack do
     {:noreply, [value | state]}
   end
 
+  def terminate(reason, state) do
+    IO.puts "Reason ==> #{inspect reason}"
+    IO.puts "State ==> #{inspect state}"
+  end
 end
