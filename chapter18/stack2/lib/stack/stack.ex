@@ -27,7 +27,6 @@ defmodule Stack.Server do
   end
 
   def terminate(_reason, {stack, stash_pid}) do
-    IO.puts "terminate"
     Stack.Stash.save_value stash_pid, stack
   end
 end
